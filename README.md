@@ -37,7 +37,7 @@ FitBack is a mobile fitness application that helps users monitor their physical 
 
 3. Set up the MySQL database:
     - Create a database named `fitback`.
-    - Use the following SQL to create the necessary `users` and `user_profiles` tables:
+    - Use the following SQL to create the necessary `users`, `user_profiles` and `user_activties tables:
     ```sql
     CREATE TABLE users (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -56,6 +56,15 @@ FitBack is a mobile fitness application that helps users monitor their physical 
         profile_image TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id)
     );
+
+    CREATE TABLE user_activities (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        date DATE NOT NULL,
+        exercise TEXT,
+        meal TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        );
     ```
 
 4. Update the database connection in `backend/database.js`:
