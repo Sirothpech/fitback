@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const defaultProfileImage = require('../assets/default-profile.jpeg');
 
@@ -13,8 +14,6 @@ function ProfileScreen({ navigation }) {
   const [gender, setGender] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
-  const [bmi, setBmi] = useState(null);
-  const [bmiCategory, setBmiCategory] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
   const [userID, setUserID] = useState(null);
@@ -28,7 +27,6 @@ function ProfileScreen({ navigation }) {
       const id = await AsyncStorage.getItem('userID');
       if (id) {
         setUserID(id);
-        console.log('UserID:', id);
         loadUserData(id);
       } else {
         Alert.alert("Erreur", "Utilisateur non trouvé");
@@ -41,7 +39,6 @@ function ProfileScreen({ navigation }) {
   const loadUserData = async (id) => {
     try {
       const savedUsername = await AsyncStorage.getItem('username');
-      console.log("Nom d'utilisateur récupéré :", savedUsername);
 
       if (id && savedUsername) {
         setUsername(savedUsername);
@@ -76,7 +73,7 @@ function ProfileScreen({ navigation }) {
         await AsyncStorage.setItem(`${userID}_profileImage`, profileImage);
       }
 
-      const response = await axios.post('http://localhost:3000/saveProfile', {
+      const response = await axios.post('http://192.168.117.86:3000/saveProfile', {
         userID,
         age,
         gender,
@@ -91,37 +88,8 @@ function ProfileScreen({ navigation }) {
         Alert.alert("Erreur", "Échec de la sauvegarde des données");
       }
     } catch (error) {
-      if (error.response) {
-        console.log("Erreur de l'API lors de la sauvegarde des données :", error.response.data);
-      } else if (error.request) {
-        console.log("Aucune réponse reçue lors de la requête :", error.request);
-      } else {
-        console.log("Erreur lors de la sauvegarde des données :", error.message);
-      }
+      console.log("Erreur lors de la sauvegarde des données :", error.message);
     }
-  };
-
-  const calculateBMI = () => {
-    const heightInMeters = height / 100;
-    const bmiValue = (weight / (heightInMeters * heightInMeters)).toFixed(2);
-    setBmi(bmiValue);
-
-    let category = '';
-    if (bmiValue < 18.5) {
-      category = 'Insuffisance pondérale (maigreur)';
-    } else if (bmiValue >= 18.5 && bmiValue <= 24.9) {
-      category = 'Poids normal';
-    } else if (bmiValue >= 25.0 && bmiValue <= 29.9) {
-      category = 'Surpoids';
-    } else if (bmiValue >= 30.0 && bmiValue <= 34.9) {
-      category = 'Obésité modérée';
-    } else if (bmiValue >= 35.0 && bmiValue <= 39.9) {
-      category = 'Obésité sévère';
-    } else if (bmiValue >= 40.0) {
-      category = 'Obésité massive';
-    }
-
-    setBmiCategory(category);
   };
 
   const pickImage = async () => {
@@ -147,122 +115,97 @@ function ProfileScreen({ navigation }) {
     }
   };
 
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Profil de {capitalizeFirstLetter(username)}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <LinearGradient colors={['#451e6a', 'black']} style={styles.background} />
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>Profil de {username}</Text>
 
-      <Image
-        source={profileImage ? { uri: profileImage } : defaultProfileImage}
-        style={styles.profileImage}
-      />
+          <Image
+            source={profileImage ? { uri: profileImage } : defaultProfileImage}
+            style={styles.profileImage}
+          />
 
-      <Button
-        title="Choisir une Photo de Profil"
-        onPress={pickImage}
-        buttonStyle={{
-          backgroundColor: 'rgba(61, 153, 245, 1)',
-          borderRadius: 15,
-          margin: 10,
-        }}
-      />
+          <Button
+            buttonStyle={styles.button}
+            onPress={pickImage}
+            ViewComponent={LinearGradient}
+            linearGradientProps={{
+              colors: ["rgba(61, 153, 245, 1)", "rgba(61, 100, 245, 1)"],
+              start: { x: 0, y: 0.5 },
+              end: { x: 1, y: 0.5 },
+            }}
+          >
+            Choisir une Photo de Profil
+          </Button>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Âge"
-        keyboardType="numeric"
-        value={age}
-        onChangeText={setAge}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Sexe"
-        value={gender}
-        onChangeText={setGender}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Poids (kg)"
-        keyboardType="numeric"
-        value={weight}
-        onChangeText={setWeight}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Taille (cm)"
-        keyboardType="numeric"
-        value={height}
-        onChangeText={setHeight}
-      />
+          <TextInput style={styles.input} placeholder="Âge" keyboardType="numeric" value={age} onChangeText={setAge} />
+          <TextInput style={styles.input} placeholder="Sexe" value={gender} onChangeText={setGender} />
+          <TextInput style={styles.input} placeholder="Poids (kg)" keyboardType="numeric" value={weight} onChangeText={setWeight} />
+          <TextInput style={styles.input} placeholder="Taille (cm)" keyboardType="numeric" value={height} onChangeText={setHeight} />
 
-      <Button
-        title="Calculez votre IMC"
-        onPress={calculateBMI}
-        buttonStyle={{
-          backgroundColor: 'rgba(61, 153, 245, 1)',
-          borderRadius: 15,
-          margin: 10,
-        }}
-      />
+          <Button
+            buttonStyle={styles.button}
+            onPress={saveUserData}
+            ViewComponent={LinearGradient}
+            linearGradientProps={{
+              colors: ["rgba(61, 153, 245, 1)", "rgba(61, 100, 245, 1)"],
+              start: { x: 0, y: 0.5 },
+              end: { x: 1, y: 0.5 },
+            }}
+          >
+            Sauvegarder
+          </Button>
 
-      {bmi && (
-        <View>
-          <Text style={styles.bmiResult}>Votre IMC est de {bmi}</Text>
-          <Text style={styles.bmiCategory}>Catégorie : {bmiCategory}</Text>
+          <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
+            <Text style={styles.infoButton}>Infos</Text>
+          </TouchableOpacity>
+
+          {showInfo && (
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoText}>
+                Le tour de taille est un indicateur important de l’accumulation de graisse au niveau de votre abdomen.
+              </Text>
+              <Text style={styles.infoText}>80 cm pour une femme et 94 cm pour un homme sont des seuils d’alerte.</Text>
+            </View>
+          )}
         </View>
-      )}
-
-      <Button
-        title="Sauvegarder"
-        onPress={saveUserData}
-        buttonStyle={{
-          backgroundColor: 'rgba(61, 153, 245, 1)',
-          borderRadius: 15,
-          margin: 10,
-        }}
-      />
-
-      <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
-        <Text style={styles.infoButton}>Infos</Text>
-      </TouchableOpacity>
-
-      {showInfo && (
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoText}>
-            Le tour de taille, un autre indicateur important de surpoids ou d'obésité.
-            Le tour de taille est un autre indicateur. Il donne une image simple de l’excès de graisse accumulé au niveau de votre abdomen.
-          </Text>
-          <Text style={styles.infoText}>
-            Le tour de taille est jugé trop élevé s’il est supérieur ou égal à :
-          </Text>
-          <Text style={styles.infoText}>80 cm pour une femme</Text>
-          <Text style={styles.infoText}>94 cm pour un homme</Text>
-        </View>
-      )}
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  innerContainer: {
+    flex: 1,
+    padding: 40,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: 'white',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    marginTop: 10,
+    width: '100%',
+    marginVertical: 10,
     padding: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    backgroundColor: '#fff',
   },
   profileImage: {
     width: 100,
@@ -271,21 +214,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: 'center',
   },
-  bmiResult: {
-    fontSize: 18,
-    marginTop: 20,
-    textAlign: 'center',
-    color: 'green',
-  },
-  bmiCategory: {
-    fontSize: 18,
-    marginTop: 10,
-    textAlign: 'center',
-    color: 'blue',
+  button: {
+    borderRadius: 15,
+    margin: 10,
+    borderColor: 'white',
+    borderWidth: 1,
   },
   infoButton: {
     fontSize: 12,
-    color: 'blue',
+    color: 'white',
     textAlign: 'center',
     margin: 10,
     textDecorationLine: 'underline',
@@ -297,6 +234,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 12,
     textAlign: 'center',
+    color: 'white',
   },
 });
 

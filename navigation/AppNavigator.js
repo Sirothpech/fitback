@@ -12,6 +12,8 @@ import ChronometerScreen from '../screens/ChronometerScreen';
 import TimerTabataScreen from '../screens/TimerTabataScreen';
 import NutritionScreen from '../screens/NutritionScreen';
 import RecipeScreen from '../screens/RecipeScreen';
+import CalendarScreen from '../screens/CalendarScreen';
+
 
 // Crée les navigateurs
 const Stack = createStackNavigator();
@@ -44,14 +46,15 @@ function TabNavigator() {
         tabBarStyle: { display: 'flex' },
       })}
     >
-      <Tab.Screen name="Home" component={DashboardScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Timer" component={TimerScreen} />
+      <Tab.Screen name="Home" component={DashboardScreen} />
       <Tab.Screen name="Nutrition" component={NutritionScreen} />
       <Tab.Screen name="Recipe" component={RecipeScreen} />
     </Tab.Navigator>
   );
 }
+
 
 
 // Stack Navigator principal
@@ -63,6 +66,7 @@ function AppNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       {/* Ajoute TabNavigator comme écran Dashboard */}
       <Stack.Screen name="Chronometer" component={ChronometerScreen} />
+      <Stack.Screen name="Calendar" component={CalendarScreen} />
       <Stack.Screen name="TimerTabata" component={TimerTabataScreen} />
       <Stack.Screen name="Dashboard" component={TabNavigator} options={{ headerShown: false }} />
     </Stack.Navigator>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import getToken from '../getToken';
 import translateText from '../translation';
 import axios from 'axios';
+import { Button } from '@rneui/themed';
+import { LinearGradient } from 'expo-linear-gradient';
 
 function RecipeScreen() {
   const [recipeQuery, setRecipeQuery] = useState('');
@@ -110,18 +112,31 @@ function RecipeScreen() {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['#451e6a', 'black']}
+        style={styles.background}
+        />
       <TextInput
         style={styles.input}
         placeholder="Recherche de recettes"
         value={recipeQuery}
         onChangeText={setRecipeQuery}
       />
-      <Button title="Rechercher" onPress={searchRecipe} />
+      <Button title="Rechercher" onPress={searchRecipe}
+      buttonStyle={{
+        borderRadius: 15,
+        margin: 10,
+        width: 350,
+        backgroundColor: '#ac53a6',
+        borderWidth: 1,
+        borderColor: 'white',
+      }} />
 
       {/* Afficher les ingrédients de la recette sélectionnée */}
       {selectedRecipeIngredients ? (
         <View style={styles.ingredientsContainer}>
-          <Text style={styles.recipeTitle}>Ingrédients :</Text>
+          <Text style={styles.recipeTitle2}>Ingrédients :</Text>
           <FlatList
             data={selectedRecipeIngredients}
             renderItem={renderIngredientItem}
@@ -144,8 +159,16 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
   input: {
     height: 40,
+    backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 20,
@@ -173,6 +196,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#333',
+  },
+  recipeTitle2: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#fff',
   },
   recipeDescription: {
     fontSize: 14,
@@ -183,7 +213,7 @@ const styles = StyleSheet.create({
   },
   ingredient: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     marginBottom: 5,
   },
 });

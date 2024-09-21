@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { Button } from '@rneui/themed';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const TOTAL_TIME = 4 * 60; // 4 minutes en secondes
 const ROUND_TIME = 20; // Temps de l'exercice en secondes
@@ -63,6 +64,11 @@ function TimerTabataScreen() {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['#451e6a', 'black']}
+        style={styles.background}
+        />
       {/* Cercle extérieur pour le temps global avec animation */}
       <AnimatedCircularProgress
         size={300}
@@ -101,8 +107,15 @@ function TimerTabataScreen() {
       <Button
         title="Reset"
         onPress={resetTimer}
-        buttonStyle={styles.resetButton}
-      />
+        buttonStyle={{
+          borderRadius: 15,
+          margin: 10,
+          width: 350,
+          backgroundColor: '#ac53a6',
+          borderWidth: 1,
+          borderColor: 'white',
+        }}
+      ></Button>
     </View>
   );
 }
@@ -113,6 +126,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000', // Fond noir pour l'effet
+  },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: '100%',
   },
   innerCircleContainer: {
     position: 'absolute',
@@ -139,12 +159,16 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 30,
     width: 350,
+    borderWidth: 1,
+    borderColor: 'white',
   },
   resetButton: {
-    backgroundColor: 'rgba(245, 176, 61, 1)',
+    backgroundColor: '#ac53a6',
     borderRadius: 15,
     marginTop: 10,
     width: 350,
+    borderWidth: 1,
+    borderColor: 'white',
   },
 });
 

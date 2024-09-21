@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import { Button } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const defaultProfileImage = require('../assets/default-profile.jpeg');
 
@@ -64,13 +65,13 @@ function DashboardScreen({ navigation }) {
     let category = '';
     if (bmiValue < 18.5) {
       category = 'Insuffisance pondérale (maigreur)';
-    } else if (bmiValue >= 18.5 && bmiValue <= 24.9) {
+    } else if (bmiValue >= 18.5 && bmiValue <= 24.99) {
       category = 'Poids normal';
-    } else if (bmiValue >= 25.0 && bmiValue <= 29.9) {
+    } else if (bmiValue >= 25.0 && bmiValue <= 29.99) {
       category = 'Surpoids';
-    } else if (bmiValue >= 30.0 && bmiValue <= 34.9) {
+    } else if (bmiValue >= 30.0 && bmiValue <= 34.99) {
       category = 'Obésité modérée';
-    } else if (bmiValue >= 35.0 && bmiValue <= 39.9) {
+    } else if (bmiValue >= 35.0 && bmiValue <= 39.99) {
       category = 'Obésité sévère';
     } else if (bmiValue >= 40.0) {
       category = 'Obésité massive';
@@ -79,48 +80,116 @@ function DashboardScreen({ navigation }) {
     setBmiCategory(category);
   };
 
+  const showBmiCategories = () => {
+    Alert.alert(
+      "Catégories IMC",
+      "Insuffisance pondérale (maigreur): <18.5\nPoids normal: 18.5 - 24.99\nSurpoids: 25 - 29.99\nObésité modérée: 30 - 34.99\nObésité sévère: 35 - 39.99\nObésité massive: >=40"
+    );
+  };
   // Fonction pour se déconnecter
   const handleLogout = async () => {
     try {
-      await AsyncStorage.clear(); // Efface toutes les données stockées
-      navigation.replace('Login'); // Redirige vers l'écran de connexion
+        const token = await AsyncStorage.getItem('token'); // Récupère le token JWT
+
+        // Appel à la route logout du backend pour invalider le token
+        const response = await fetch('http://192.168.117.86:3000/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Effacer uniquement les données de session
+            await AsyncStorage.removeItem('token');
+            await AsyncStorage.removeItem('userID');
+            Alert.alert("Succès", "Déconnexion réussie.");
+            navigation.replace('Home'); // Redirige vers l'écran de connexion
+        } else {
+            Alert.alert("Erreur", result.message || "Erreur lors de la déconnexion.");
+        }
     } catch (error) {
-      console.log("Erreur lors de la déconnexion :", error);
+        console.log("Erreur lors de la déconnexion :", error);
+        Alert.alert("Erreur", "Une erreur est survenue lors de la déconnexion.");
     }
-  };
+};
+
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['#451e6a', 'black']}
+        style={styles.background}
+        />
+        {/* Barre de couleur arrondie en haut */}
+      {/* <View style={styles.topBarWrapper}>
+      <View style={styles.topBar} />
+      </View> */}
       <Text style={styles.title}>Bienvenue {capitalizeFirstLetter(username)}</Text>
       <Image
         source={profileImage ? { uri: profileImage } : defaultProfileImage}
         style={styles.profileImage}
       />
-      {profileImage && (
-        <Image source={{ uri: profileImage }} style={styles.profileImage} />
-      )}
 
-      {/* Cadre pour les informations */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>Âge : {age}</Text>
-        <Text style={styles.infoText}>Sexe : {gender}</Text>
-        <Text style={styles.infoText}>Poids : {weight} kg</Text>
-        <Text style={styles.infoText}>Taille : {height} cm</Text>
-        <Text style={styles.infoText}>IMC : {bmi}</Text>
-        <Text style={styles.infoText}>Catégorie IMC : {bmiCategory}</Text>
+      {/* Conteneur pour les informations */}
+      <View style={styles.infoGrid}>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>Âge</Text>
+          <Text style={styles.infoValue}>{age}</Text>
+        </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>Sexe</Text>
+          <Text style={styles.infoValue}>{gender}</Text>
+        </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>Poids</Text>
+          <Text style={styles.infoValue}>{weight} kg</Text>
+        </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>Taille</Text>
+          <Text style={styles.infoValue}>{height} cm</Text>
+        </View>
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>IMC</Text>
+          <Text style={styles.infoValue}>{bmi}</Text>
+        </View>
+        <View style={styles.infoBox}>
+         <Text style={styles.infoText}>Catégorie IMC</Text>
+         <Text style={styles.infoValue} onPress={showBmiCategories}>{bmiCategory}</Text>
+        </View>
+
       </View>
+
+      <Button 
+        title="Suivi de l'entraînement" 
+        onPress={() => navigation.navigate('Calendar')}
+        buttonStyle={{
+          backgroundColor: '#ac53a6',
+          borderRadius: 15,
+          marginTop: 20,
+          width: 350,
+          borderWidth: 1,
+          borderColor: 'white',
+        }}
+      ></Button>
 
       {/* Bouton de déconnexion */}
       <Button 
         title="Déconnexion" 
         onPress={handleLogout}
         buttonStyle={{
-          backgroundColor: 'rgba(245, 61, 61, 1)',
+          backgroundColor: '#451e6a',
           borderRadius: 15,
           marginTop: 20,
           width: 350,
+          borderWidth: 1,
+          borderColor: 'white',
         }}
-      />
+      ></Button>
     </View>
   );
 }
@@ -128,39 +197,76 @@ function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  // topBarWrapper: {
+  //   position: 'absolute',
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   height: 150,
+  //   backgroundColor: 'transparent',
+  //   zIndex: 1,
+  // },
+  // topBar: {
+  //   position: 'absolute',
+  //   top: 0,
+  //   left: 0, // Ajouté pour coller la barre au bord gauche
+  //   right: 0, // Ajouté pour coller la barre au bord droit
+  //   bottom: -50,
+  //   height: 100,
+  //   backgroundColor: '#3b82f6',
+  //   borderTopRightRadius: 150,
+  // },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginTop: 120, // Pour décaler le titre sous la barre
+    color: 'white',
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
     marginBottom: 20,
+    marginTop: 10,
   },
-  infoContainer: {
+  infoGrid: {
     width: '100%',
-    padding: 20,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  infoBox: {
+    width: '45%',
+    padding: 15,
+    marginVertical: 10,
     backgroundColor: '#f9f9f9',
-    marginBottom: 20,
+    borderRadius: 10,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   infoText: {
     fontSize: 16,
-    marginVertical: 5,
-    textAlign: 'center',
+    color: '#333',
+  },
+  infoValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 5,
   },
 });
 

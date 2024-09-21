@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, FlatList, StyleSheet } from 'react-native';
+import { View, TextInput, Text, FlatList, StyleSheet } from 'react-native';
 import getToken from '../getToken';
 import translateText from '../translation';
 import axios from 'axios';
+import { Button } from '@rneui/themed';
+import { LinearGradient } from 'expo-linear-gradient';
 
 function NutritionScreen() {
   const [foodQuery, setFoodQuery] = useState('');
@@ -62,13 +64,26 @@ function NutritionScreen() {
 
   return (
     <View style={styles.container}>
+            <LinearGradient
+        // Background Linear Gradient
+        colors={['#451e6a', 'black']}
+        style={styles.background}
+        />
       <TextInput
         style={styles.input}
         placeholder="Recherche d'aliments"
         value={foodQuery}
         onChangeText={setFoodQuery}
       />
-      <Button title="Rechercher" onPress={searchFood} />
+      <Button title="Rechercher" onPress={searchFood}
+      buttonStyle={{
+        borderRadius: 15,
+        margin: 10,
+        width: 350,
+        backgroundColor: '#ac53a6',
+        borderWidth: 1,
+        borderColor: 'white',
+      }} />
       {results.length > 0 && (
         <FlatList
           data={results}
@@ -85,8 +100,16 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
   input: {
     height: 40,
+    backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 20,

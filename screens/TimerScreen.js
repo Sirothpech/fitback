@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Button } from '@rneui/themed';
 import * as Font from 'expo-font'; // Importer expo-font pour charger la police
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 function TimerScreen({ navigation }) {
   const [timeLeft, setTimeLeft] = useState(30); // Temps affiché et restant
@@ -16,7 +18,7 @@ function TimerScreen({ navigation }) {
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
-        'digital': require('../assets/fonts/ds-digital.ttf'), // Chemin vers la police téléchargée
+        'digital': require('../assets/fonts/DS-DIGI.ttf'), // Chemin vers la police téléchargée
       });
       setFontsLoaded(true); // Police chargée
     }
@@ -67,6 +69,11 @@ function TimerScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['#451e6a', 'black']}
+        style={styles.background}
+        />
       {/* Afficher le temps sélectionné ou restant */}
       <View style={styles.timerContainer}>
         <Text style={styles.time}>{formatTime(timeLeft)}</Text>
@@ -87,42 +94,66 @@ function TimerScreen({ navigation }) {
         title={running && !paused ? 'Pause' : running ? 'Resume' : 'Start'}
         onPress={handleStartPause}
         buttonStyle={{
-          backgroundColor: 'rgba(61, 153, 245, 1)',
           borderRadius: 15,
           margin: 10,
           width: 350,
+          borderWidth: 1,
+          borderColor: 'white',
         }}
-      />
+        ViewComponent={LinearGradient} // Don't forget this!
+        linearGradientProps={{
+          colors: ["rgba(61, 153, 245, 1)", "rgba(61, 100, 245, 1)"],
+          start: { x: 0, y: 0.5 },
+          end: { x: 1, y: 0.5 },
+        }}
+      ></Button>
+      
       <Button
         title="Reset"
         onPress={() => { setTimeLeft(selectedTime); setRunning(false); setPaused(false); }}
         buttonStyle={{
-          backgroundColor: 'rgba(245, 176, 61, 1)',
           borderRadius: 15,
           margin: 10,
           width: 350,
+          backgroundColor: '#ac53a6',
+          borderWidth: 1,
+          borderColor: 'white',
         }}
-      />
+      ></Button>
       <Button
     title="Chronomètre"
     onPress={() => navigation.navigate('Chronometer')} // Navigue vers le chronomètre
     buttonStyle={{
-        backgroundColor: 'rgba(61, 153, 245, 1)',
         borderRadius: 15,
         margin: 10,
         width: 350,
+        borderWidth: 1,
+        borderColor: 'white',
     }}
-    />
+    ViewComponent={LinearGradient} // Don't forget this!
+        linearGradientProps={{
+          colors: ["rgba(61, 153, 245, 1)", "rgba(61, 100, 245, 1)"],
+          start: { x: 0, y: 0.5 },
+          end: { x: 1, y: 0.5 },
+        }}
+      ></Button>
     <Button
     title="Timer Tabata"
     onPress={() => navigation.navigate('TimerTabata')} // Navigue vers le chronomètre
     buttonStyle={{
-        backgroundColor: 'rgba(61, 153, 245, 1)',
         borderRadius: 15,
         margin: 10,
         width: 350,
+        borderWidth: 1,
+        borderColor: 'white',
     }}
-    />
+    ViewComponent={LinearGradient} // Don't forget this!
+        linearGradientProps={{
+          colors: ["rgba(61, 153, 245, 1)", "rgba(61, 100, 245, 1)"],
+          start: { x: 0, y: 0.5 },
+          end: { x: 1, y: 0.5 },
+        }}
+      ></Button>
     <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
         <Text style={styles.infoButton}>Infos</Text>
       </TouchableOpacity>
@@ -131,12 +162,14 @@ function TimerScreen({ navigation }) {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>
             Le timer tabata dure 4 minutes et est composé de 8 séries de 20 secondes d'effort et de 10 secondes de repos.
+            Idéal pour un entraînement intensif de type HIIT (High Intensity Interval Training).
           </Text>
         </View>
       )}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -145,20 +178,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#000', // Couleur de fond noire pour l'effet digital
   },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: '100%',
+  },
   timerContainer: {
     backgroundColor: '#111', // Arrière-plan foncé pour l'écran digital
     paddingVertical: 20,
     paddingHorizontal: 40,
-    borderRadius: 10,
+    borderRadius: 50,
     marginBottom: 20,
     borderWidth: 3,
-    borderColor: '#00ff00', // Couleur verte pour l'effet d'écran digital
+    borderColor: '#00ffff', // Couleur verte pour l'effet d'écran digital
   },
   time: {
     fontSize: 60,
-    fontWeight: 'bold',
-    color: '#00ff00', // Couleur verte pour l'affichage du temps (effet digital)
-    textShadowColor: 'rgba(0, 255, 0, 0.75)', // Effet lumineux autour du texte
+    color: '#ac53a6', // Couleur verte pour l'affichage du temps (effet digital)
+    textShadowColor: 'rgba(255, 0, 255, 0.75)', // Effet lumineux autour du texte
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 10,
     fontFamily: 'digital', // Utilisation de la police personnalisée chargée
