@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 const defaultProfileImage = require('../assets/default-profile.jpeg');
 
 function ProfileScreen({ navigation }) {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [weight, setWeight] = useState('');
@@ -38,10 +38,10 @@ function ProfileScreen({ navigation }) {
 
   const loadUserData = async (id) => {
     try {
-      const savedUsername = await AsyncStorage.getItem('username');
+      const savedUsername = await AsyncStorage.getItem('identifier');
 
       if (id && savedUsername) {
-        setUsername(savedUsername);
+        setIdentifier(savedUsername);
         const savedAge = await AsyncStorage.getItem(`${id}_age`);
         const savedGender = await AsyncStorage.getItem(`${id}_gender`);
         const savedWeight = await AsyncStorage.getItem(`${id}_weight`);
@@ -157,6 +157,9 @@ const chooseFromGallery = async () => {
     }
 };
 
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
   return (
     <KeyboardAvoidingView
@@ -166,7 +169,7 @@ const chooseFromGallery = async () => {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <LinearGradient colors={['#451e6a', 'black']} style={styles.background} />
         <View style={styles.innerContainer}>
-          <Text style={styles.title}>Profil de {username}</Text>
+          <Text style={styles.title}>Profil de {capitalizeFirstLetter(identifier)}</Text>
 
           <Image
             source={profileImage ? { uri: profileImage } : defaultProfileImage}

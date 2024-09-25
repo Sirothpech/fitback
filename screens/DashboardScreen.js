@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 const defaultProfileImage = require('../assets/default-profile.jpeg');
 
 function DashboardScreen({ navigation }) {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [weight, setWeight] = useState('');
@@ -26,10 +26,10 @@ function DashboardScreen({ navigation }) {
   const loadUserData = async () => {
     try {
       const userID = await AsyncStorage.getItem('userID');
-      const savedUsername = await AsyncStorage.getItem('username');
+      const savedUsername = await AsyncStorage.getItem('identifier');
 
       if (userID && savedUsername) {
-        setUsername(savedUsername);
+        setIdentifier(savedUsername);
         const savedAge = await AsyncStorage.getItem(`${userID}_age`);
         const savedGender = await AsyncStorage.getItem(`${userID}_gender`);
         const savedWeight = await AsyncStorage.getItem(`${userID}_weight`);
@@ -129,7 +129,7 @@ function DashboardScreen({ navigation }) {
       {/* <View style={styles.topBarWrapper}>
       <View style={styles.topBar} />
       </View> */}
-      <Text style={styles.title}>Bienvenue {capitalizeFirstLetter(username)}</Text>
+      <Text style={styles.title}>Bienvenue {capitalizeFirstLetter(identifier)}</Text>
       <Image
         source={profileImage ? { uri: profileImage } : defaultProfileImage}
         style={styles.profileImage}
