@@ -13,11 +13,14 @@ import TimerTabataScreen from '../screens/TimerTabataScreen';
 import NutritionScreen from '../screens/NutritionScreen';
 import RecipeScreen from '../screens/RecipeScreen';
 import CalendarScreen from '../screens/CalendarScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 
 
 // Crée les navigateurs
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
 
 // Tab Navigator pour la navigation en bas (onglets)
 function TabNavigator() {
@@ -68,6 +71,8 @@ function AppNavigator() {
       <Stack.Screen name="Chronometer" component={ChronometerScreen} />
       <Stack.Screen name="Calendar" component={CalendarScreen} />
       <Stack.Screen name="TimerTabata" component={TimerTabataScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       <Stack.Screen name="Dashboard" component={TabNavigator} options={{ headerShown: false }} />
     </Stack.Navigator>
   );

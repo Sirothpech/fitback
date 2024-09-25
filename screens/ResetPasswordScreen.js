@@ -3,64 +3,55 @@ import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from 'reac
 import { Button, Icon } from '@rneui/themed';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function LoginScreen({ navigation }) {
-    const [identifier, setIdentifier] = useState('');
-    const [password, setPassword] = useState('');
+const ResetPasswordScreen = ({ route, navigation }) => {
+    const [email, setEmail] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false); // État pour basculer l'affichage du mot de passe
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
     };
 
-    const handleLogin = async () => {
+    const handleResetPassword = async () => {
         try {
-            const response = await axios.post('http://192.168.117.86:3000/login', {
-                identifier,
-                password
+            const response = await axios.post('http://192.168.117.86:3000/reset-password', {
+                email,
+                verificationCode,
+                newPassword,
             });
-            
-            const { token, userId } = response.data;
-
-            // Sauvegarder le token et le userId dans AsyncStorage
-            await AsyncStorage.setItem('token', token);
-            await AsyncStorage.setItem('userID', userId.toString());
-            await AsyncStorage.setItem('identifier', identifier);
-
-
-            Alert.alert("Succès", "Connexion réussie !");
-            navigation.navigate('Dashboard');
+            Alert.alert('Succès', 'Votre mot de passe a été réinitialisé.');
+            navigation.navigate('Login');
         } catch (error) {
-            Alert.alert("Erreur", "Échec de la connexion !");
-            console.error(error);
+            Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer.');
         }
     };
 
     return (
         <View style={styles.container}>
-            <LinearGradient
-                // Background Linear Gradient
-                colors={['#451e6a', 'black']}
-                style={styles.background}
-            />
-            <Text style={{ color: 'white', fontSize: 24, marginBottom: 20 }}>Login</Text>
-            
-            {/* Champ du nom d'utilisateur */}
+            <LinearGradient colors={['#451e6a', 'black']} style={styles.background} />
+            <Text style={{ color: 'white', fontSize: 24, marginBottom: 20 }}>Réinitialiser le mot de passe</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Username or Email"
-                value={identifier}
-                onChangeText={setIdentifier}
+                placeholder="Votre Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
             />
-
-            {/* Champ du mot de passe avec icône œil */}
+            <TextInput
+                style={styles.input}
+                placeholder="Code de vérification"
+                value={verificationCode}
+                onChangeText={setVerificationCode}
+                keyboardType="numeric"
+            />
             <View style={styles.passwordContainer}>
-                <TextInput
+            <TextInput
                     style={styles.inputPassword} // Ajuste ce style séparément pour le mot de passe
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChangeText={setNewPassword}
                     secureTextEntry={!isPasswordVisible} // Basculer entre affichage et masquage du mot de passe
                 />
                 <TouchableOpacity onPress={togglePasswordVisibility} style={styles.icon}>
@@ -71,28 +62,19 @@ function LoginScreen({ navigation }) {
                         color="gray" 
                     />
                 </TouchableOpacity>
-            </View>
-
-            <Button 
-                title="LOGIN" 
-                onPress={handleLogin}
+                </View>
+            <Button
+                title="Réinitialiser"
+                onPress={handleResetPassword}
                 buttonStyle={{
                     backgroundColor: 'rgba(61, 153, 245, 1)',
                     borderRadius: 15,
                     margin: 10,
                 }}
-                icon={{
-                    name: "login",
-                    size: 15,
-                    color: "white",
-                }}
-                iconRight={true} 
             />
-            <Text style={{ color: 'white', marginTop: 20 }}
-            onPress={() => navigation.navigate('ForgotPassword')}>Forgot your password</Text>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -108,8 +90,14 @@ const styles = StyleSheet.create({
         top: 0,
         bottom: 0,
     },
+    passwordContainer: {
+        width: '90%',  // Ajuste la largeur du conteneur pour être cohérente avec les autres inputs
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
     input: {
-        width: '90%',  // Ajuste la largeur des inputs pour qu'ils soient cohérents
+        width: '90%',
         marginVertical: 10,
         padding: 10,
         borderWidth: 1,
@@ -117,16 +105,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#fff',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 }, 
-        shadowOpacity: 0.3, 
-        shadowRadius: 5, 
-        elevation: 6, 
-    },
-    passwordContainer: {
-        width: '90%',  // Ajuste la largeur du conteneur pour être cohérente avec les autres inputs
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 10,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 6,
     },
     inputPassword: {
         flex: 1,  // Prend toute la largeur disponible
@@ -147,4 +129,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default ResetPasswordScreen;

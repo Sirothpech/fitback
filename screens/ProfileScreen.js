@@ -92,28 +92,71 @@ function ProfileScreen({ navigation }) {
     }
   };
 
+
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const options = [
+        {
+            text: "Prendre une photo",
+            onPress: takePhoto
+        },
+        {
+            text: "Choisir dans la galerie",
+            onPress: chooseFromGallery
+        },
+        {
+            text: "Annuler",
+            style: "cancel"
+        }
+    ];
+
+    Alert.alert("Sélectionner une option", "", options);
+};
+
+const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (permissionResult.granted === false) {
-      alert("Permission to access gallery is required!");
-      return;
+        alert("Permission to access camera is required!");
+        return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+    const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
     });
 
     if (!result.canceled) {
-      const selectedImageUri = result.assets[0].uri;
-      setProfileImage(selectedImageUri);
-      if (userID) {
-        await AsyncStorage.setItem(`${userID}_profileImage`, selectedImageUri);
-      }
+        const selectedImageUri = result.assets[0].uri;
+        setProfileImage(selectedImageUri);
+        if (userID) {
+            await AsyncStorage.setItem(`${userID}_profileImage`, selectedImageUri);
+        }
     }
-  };
+};
+
+const chooseFromGallery = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+        alert("Permission to access gallery is required!");
+        return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+    });
+
+    if (!result.canceled) {
+        const selectedImageUri = result.assets[0].uri;
+        setProfileImage(selectedImageUri);
+        if (userID) {
+            await AsyncStorage.setItem(`${userID}_profileImage`, selectedImageUri);
+        }
+    }
+};
+
 
   return (
     <KeyboardAvoidingView
