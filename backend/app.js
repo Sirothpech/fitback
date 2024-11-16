@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require('dotenv').config();
 
 const db = require('./database');
 
@@ -77,7 +78,7 @@ app.post('/login', async (req, res) => {
       }
 
       // Générer le token JWT
-      const token = jwt.sign({ userId: user[0].id, username: user[0].username }, 'SECRET_KEY', { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user[0].id, username: user[0].username }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
       // Sauvegarder le token dans la table sessions
       await db.execute(
@@ -102,7 +103,7 @@ app.post('/logout', async (req, res) => {
 
   try {
     // Vérifie si le token est valide
-    jwt.verify(token, 'SECRET_KEY', async (err, decoded) => {
+    jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).send({ message: "Token invalide ou expiré." });
       }
@@ -253,12 +254,13 @@ app.get('/getActivity', async (req, res) => {
         const nodemailer = require('nodemailer');
 
         const transporter = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: {
-                user: 'christophe.ngan@gmail.com',
-                pass: 'pght jbep hhre hkay'
-            }
-        });
+          service: 'Gmail',
+          auth: {
+              user: process.env.GMAIL_USER,
+              pass: process.env.GMAIL_PASS
+          }
+      });
+      
 
         const mailOptions = {
             from: 'christophe.ngan@gmail.com',
